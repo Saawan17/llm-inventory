@@ -550,76 +550,93 @@ def logged_calculator(
 # -----------------------------------------
 
 def convert_temperature(
-        temperature: float,
-        from_unit: str,
-        to_unit: str
+    temperature: float,
+    from_unit: str,
+    to_unit: str
 ) -> dict:
+    """
+    REQUIRED TOOL for temperature unit conversion.
 
+    Use this tool whenever a user requests a temperature
+    conversion between Celsius and Fahrenheit.
+
+    Do not perform Celsius/Fahrenheit conversion yourself.
     """
-    Convert temperature between Celsius and Fahrenheit.
-    """
+
+    arguments = {
+        "temperature": temperature,
+        "from_unit": from_unit,
+        "to_unit": to_unit
+    }
+
+    # -----------------------------------------
+    # Log tool call
+    # -----------------------------------------
+
+    log_tool_call(
+        "convert_temperature",
+        arguments
+    )
+
+    # -----------------------------------------
+    # Validate temperature
+    # -----------------------------------------
 
     try:
-         
+
         temperature = float(temperature)
 
     except (ValueError, TypeError):
-        return {
+
+        result = {
             "success": False,
             "error": {
                 "type": "invalid_input",
-                "message": "Temperature must be a valid numeric value."
+                "message": "Temperature must be a number."
             }
         }
 
-    valid_units = {"C", "F", "K"}
+        log_tool_result(
+            "convert_temperature",
+            result
+        )
+
+        return result
 
     from_unit = from_unit.upper()
     to_unit = to_unit.upper()
 
-    if from_unit not in valid_units or to_unit not in valid_units:
-        return {
-            "success": False,
-            "error": {
-                "type": "invalid_unit",
-                "message": (
-                    f"Unsupported unit. Supported units are: "
-                    f"{', '.join(valid_units)}."
-                )
-            }
-        }
-
     # -----------------------------------------
-    # Celsius -> Fahrenheit
+    # Celsius → Fahrenheit
     # -----------------------------------------
 
     if from_unit == "C" and to_unit == "F":
 
-        result = (temperature * 9 / 5) + 32
+        converted_value = (temperature * 9 / 5) + 32
 
     # -----------------------------------------
-    # Fahrenheit -> Celsius
+    # Fahrenheit → Celsius
     # -----------------------------------------
 
     elif from_unit == "F" and to_unit == "C":
 
-        result = (temperature - 32) * 5 / 9
+        converted_value = (temperature - 32) * 5 / 9
 
     # -----------------------------------------
-    # Same unit, no conversion needed
+    # Same unit
     # -----------------------------------------
 
     elif from_unit == to_unit:
-        
-        result = temperature
 
-     # -----------------------------------------
+        converted_value = temperature
+
+    # -----------------------------------------
     # Unsupported conversion
     # -----------------------------------------
 
     else:
 
-        return {
+        result = {
             "success": False,
             "error": {
                 "type": "unsupported_conversion",
@@ -630,13 +647,34 @@ def convert_temperature(
             }
         }
 
-    return {
+        log_tool_result(
+            "convert_temperature",
+            result
+        )
+
+        return result
+
+    # -----------------------------------------
+    # Successful result
+    # -----------------------------------------
+
+    result = {
         "success": True,
         "data": {
-            "value": round(result, 2),
+            "value": round(converted_value, 2),
             "unit": to_unit
         }
     }
 
+    # -----------------------------------------
+    # Log result
+    # -----------------------------------------
+
+    log_tool_result(
+        "convert_temperature",
+        result
+    )
+
+    return result
 
 

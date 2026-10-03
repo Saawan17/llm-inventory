@@ -125,17 +125,17 @@ chat = client.chats.create(
 
             Keep responses simple and conversational.
 
-            Temperature conversion workflow:
+            Temperature conversion rules:
 
-            When the user asks for weather in a different temperature unit:
-
-            1. Find the requested location using get_location_coordinates.
-            2. Use the returned coordinates with get_weather.
-            3. If the weather result is in Celsius and the user wants Fahrenheit,
-            use convert_temperature.
-            4. Use the final converted value in the response.
-            5. Do not perform the conversion mentally when the conversion tool
-            is available.
+            1. If the user requests a temperature in a different unit,
+            ALWAYS call convert_temperature.
+            2. Do not calculate the conversion yourself.
+            3. If get_weather returns Celsius and the user requested Fahrenheit,
+            call convert_temperature with:
+                temperature = weather temperature
+                from_unit = "C"
+                to_unit = "F"
+            4. Return the converted value from the tool.
             """,
             tools=[
         calculator,
