@@ -1,0 +1,16 @@
+[
+    {
+        "id": 1,
+        "title": "Learn LangChain",
+        "due_date": "",
+        "completed": true,
+        "created_at": "2026-09-25T22:43:57.344515"
+    },
+    {
+        "id": 2,
+        "title": "Go to my home town",
+        "due_date": "tomorrow",
+        "completed": true,
+        "created_at": "2026-09-25T22:45:24.300738"
+    }
+]
