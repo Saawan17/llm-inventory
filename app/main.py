@@ -22,7 +22,8 @@ from tools import (
     get_location_coordinates,
     get_weather,
     get_location_coordinates_with_logging,
-    get_weather_with_logging
+    get_weather_with_logging,
+    convert_temperature
 )
 
 
@@ -123,6 +124,18 @@ chat = client.chats.create(
             7. Never invent weather information.
 
             Keep responses simple and conversational.
+
+            Temperature conversion workflow:
+
+            When the user asks for weather in a different temperature unit:
+
+            1. Find the requested location using get_location_coordinates.
+            2. Use the returned coordinates with get_weather.
+            3. If the weather result is in Celsius and the user wants Fahrenheit,
+            use convert_temperature.
+            4. Use the final converted value in the response.
+            5. Do not perform the conversion mentally when the conversion tool
+            is available.
             """,
             tools=[
         calculator,
@@ -131,7 +144,8 @@ chat = client.chats.create(
         get_tasks,
         complete_task,
         get_location_coordinates_with_logging,
-        get_weather_with_logging
+        get_weather_with_logging,
+        convert_temperature
     ],
         automatic_function_calling=types.AutomaticFunctionCallingConfig(
             disable=False

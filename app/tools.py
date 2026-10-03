@@ -543,3 +543,100 @@ def logged_calculator(
     )
 
     return result
+
+
+# -----------------------------------------
+# Convert between the temprature units Celsius, Fahrenheit, and Kelvin
+# -----------------------------------------
+
+def convert_temperature(
+        temperature: float,
+        from_unit: str,
+        to_unit: str
+) -> dict:
+
+    """
+    Convert temperature between Celsius and Fahrenheit.
+    """
+
+    try:
+         
+        temperature = float(temperature)
+
+    except (ValueError, TypeError):
+        return {
+            "success": False,
+            "error": {
+                "type": "invalid_input",
+                "message": "Temperature must be a valid numeric value."
+            }
+        }
+
+    valid_units = {"C", "F", "K"}
+
+    from_unit = from_unit.upper()
+    to_unit = to_unit.upper()
+
+    if from_unit not in valid_units or to_unit not in valid_units:
+        return {
+            "success": False,
+            "error": {
+                "type": "invalid_unit",
+                "message": (
+                    f"Unsupported unit. Supported units are: "
+                    f"{', '.join(valid_units)}."
+                )
+            }
+        }
+
+    # -----------------------------------------
+    # Celsius -> Fahrenheit
+    # -----------------------------------------
+
+    if from_unit == "C" and to_unit == "F":
+
+        result = (temperature * 9 / 5) + 32
+
+    # -----------------------------------------
+    # Fahrenheit -> Celsius
+    # -----------------------------------------
+
+    elif from_unit == "F" and to_unit == "C":
+
+        result = (temperature - 32) * 5 / 9
+
+    # -----------------------------------------
+    # Same unit, no conversion needed
+    # -----------------------------------------
+
+    elif from_unit == to_unit:
+        
+        result = temperature
+
+     # -----------------------------------------
+    # Unsupported conversion
+    # -----------------------------------------
+
+    else:
+
+        return {
+            "success": False,
+            "error": {
+                "type": "unsupported_conversion",
+                "message": (
+                    f"Cannot convert from {from_unit} "
+                    f"to {to_unit}."
+                )
+            }
+        }
+
+    return {
+        "success": True,
+        "data": {
+            "value": round(result, 2),
+            "unit": to_unit
+        }
+    }
+
+
+
