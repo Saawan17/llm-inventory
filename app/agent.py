@@ -328,7 +328,7 @@ def run_agent(user_message: str):
 # --------------------------------------------------
 
 print("\nManual AI Agent")
-print("Type 'exit' to quit the console.\n")
+print("Type 'exit' to quit.\n")
 
 
 while True:
