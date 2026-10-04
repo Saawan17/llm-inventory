@@ -141,10 +141,25 @@ If a tool fails, explain the failure clearly.
 
 def run_agent(user_message: str):
 
-    # Initial request
-    contents = user_message
+    # ------------------------------------------
+    # Conversation history for this request
+    # ------------------------------------------
 
-    # Maximum number of tool iterations
+    contents = [
+        types.Content(
+            role="user",
+            parts=[
+                types.Part.from_text(
+                    text=user_message
+                )
+            ]
+        )
+    ]
+
+    # ------------------------------------------
+    # Safety limit
+    # ------------------------------------------
+
     max_iterations = 10
 
     for iteration in range(max_iterations):
@@ -153,9 +168,9 @@ def run_agent(user_message: str):
             f"\n[AGENT ITERATION {iteration + 1}]"
         )
 
-        # ------------------------------------------
+        # --------------------------------------
         # Ask Gemini
-        # ------------------------------------------
+        # --------------------------------------
 
         response = client.models.generate_content(
 
@@ -166,13 +181,21 @@ def run_agent(user_message: str):
             config=config
         )
 
-        # ------------------------------------------
+        # --------------------------------------
+        # Add Gemini's response to history
+        # --------------------------------------
+
+        model_content = response.candidates[0].content
+
+        contents.append(model_content)
+
+        # --------------------------------------
         # Find function calls
-        # ------------------------------------------
+        # --------------------------------------
 
         function_calls = []
 
-        for part in response.candidates[0].content.parts:
+        for part in model_content.parts:
 
             if part.function_call:
 
@@ -180,17 +203,18 @@ def run_agent(user_message: str):
                     part.function_call
                 )
 
-        # ------------------------------------------
-        # No tool call = final answer
-        # ------------------------------------------
+        # --------------------------------------
+        # No function call
+        # → Gemini has final answer
+        # --------------------------------------
 
         if not function_calls:
 
             return response.text
 
-        # ------------------------------------------
-        # Execute tools
-        # ------------------------------------------
+        # --------------------------------------
+        # Execute requested tools
+        # --------------------------------------
 
         tool_response_parts = []
 
@@ -213,9 +237,9 @@ def run_agent(user_message: str):
                 tool_arguments
             )
 
-            # --------------------------------------
-            # Find tool
-            # --------------------------------------
+            # ----------------------------------
+            # Find Python function
+            # ----------------------------------
 
             tool_function = tool_registry.get(
                 tool_name
@@ -255,18 +279,18 @@ def run_agent(user_message: str):
                         }
                     }
 
-            # --------------------------------------
-            # Print result
-            # --------------------------------------
+            # ----------------------------------
+            # Print tool result
+            # ----------------------------------
 
             print("\nTOOL RESULT")
             print("=" * 60)
 
             print(tool_result)
 
-            # --------------------------------------
+            # ----------------------------------
             # Create function response
-            # --------------------------------------
+            # ----------------------------------
 
             tool_response_parts.append(
 
@@ -278,23 +302,20 @@ def run_agent(user_message: str):
                 )
             )
 
-        # ------------------------------------------
-        # Send tool results back to Gemini
-        # ------------------------------------------
+        # --------------------------------------
+        # Add tool response as a USER turn
+        # --------------------------------------
 
-        contents = [
-
-            response.candidates[0].content,
-
+        contents.append(
             types.Content(
                 role="user",
                 parts=tool_response_parts
             )
-        ]
+        )
 
-    # --------------------------------------------------
-    # Safety limit
-    # --------------------------------------------------
+    # ------------------------------------------
+    # Maximum iteration reached
+    # ------------------------------------------
 
     return (
         "I couldn't complete the request because "
