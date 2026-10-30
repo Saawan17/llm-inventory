@@ -212,15 +212,15 @@ while True:
     # --------------------------------------------------
 
     prompt = f"""
-Knowledge-base context:
+        Knowledge-base context:
 
-{context}
+        {context}
 
 
-User's question:
+        User's question:
 
-{question}
-"""
+        {question}
+        """
 
 
     # --------------------------------------------------
