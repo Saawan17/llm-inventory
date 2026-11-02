@@ -34,20 +34,40 @@ def initialize_database():
 
     connection.commit()
 
-    cursor.execute("PRAGMA table_info(tasks)")
-
-    columns = cursor.fetchall()
-
-    for column in columns:
-        print(column)
-
     connection.close()
 
     print("Database initialized and tasks table created (if it didn't exist).")
 
+
+
+def test_insert():
+    """Test inserting a task into the database."""
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    # Insert a test task
+    cursor.execute("""
+        INSERT INTO tasks (title, due_date, completed, created_at)
+        VALUES (?, ?, ?, ?)
+    """, (
+        "Learn LangGraph",
+        "2026-11-05",
+        0,
+        "2026-10-31"
+    ))
+
+    connection.commit()
+
+    # # Fetch the inserted task
+    # cursor.execute("SELECT * FROM tasks WHERE title = ?", ("Test Task",))
+    # task = cursor.fetchone()
+
+    connection.close()
+
+    print("Inserted Task successfully into the database.")
+
 if __name__ == "__main__":
     initialize_database()
-
-
+    test_insert()
 
 
